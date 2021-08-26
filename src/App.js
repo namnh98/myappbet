@@ -1,5 +1,12 @@
 import React, {useState} from 'react';
-import {Text, View, StyleSheet, Image, TouchableOpacity,Alert} from 'react-native';
+import {
+  Text,
+  View,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
 import {images} from '../src/assets';
 import Size from '@dungdang/react-native-basic/src/Sizes';
 import {colors} from '../src/styles/Color';
@@ -19,24 +26,28 @@ const App = () => {
     setIsVible(true);
   };
   const handleSupport = () => {
-    Alert.alert('Thông báo','Chức năng đang phát triển');
+    Alert.alert('Thông báo', 'Chức năng đang phát triển');
   };
-  const SignUp = () => {};
-  const SignIn = () => {};
+  const SignUp = () => {
+    setIsVible(false);
+  };
+  const SignIn = () => {
+    setVisible(false);
+  };
   return (
     <View style={styles.container}>
       <Image source={images.logo} style={styles.logoStyle} />
       <View style={styles.buttonList}>
-        <TouchableOpacity style={styles.buttonStyle} onPress={handleSignin}>
+        <TouchableOpacity style={styles.buttonStyle} onPress={handleSignup}>
+          <Text style={styles.titleButton}>Đăng ký</Text>
+        </TouchableOpacity>
+        {isVisible && <ModalSignup visible={isVisible} handleSignUp={SignUp} />}
+        <TouchableOpacity
+          style={[styles.buttonStyle, {backgroundColor: colors.orange}]}
+          onPress={handleSignin}>
           <Text style={styles.titleButton}>Đăng nhập</Text>
         </TouchableOpacity>
         {visible && <ModalSignin visible={visible} handleSignIn={SignIn} />}
-        <TouchableOpacity
-          style={[styles.buttonStyle, {backgroundColor: colors.orange}]}
-          onPress={handleSignup}>
-          <Text style={styles.titleButton}>Đăng ký</Text>
-        </TouchableOpacity>
-        {isVisible && <ModalSignup visible={isVisible} handleSignUp={SignUp}/>}
         <TouchableOpacity style={styles.buttonStyle} onPress={handleSupport}>
           <Text style={styles.titleButton}>Hỗ trợ</Text>
         </TouchableOpacity>
