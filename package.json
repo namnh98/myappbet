@@ -11,8 +11,10 @@
   },
   "dependencies": {
     "@dungdang/react-native-basic": "^1.0.8",
+    "axios": "^0.21.1",
     "react": "17.0.2",
     "react-native": "0.65.1",
+    "recoil": "^0.4.1",
     "yarn": "^1.22.11"
   },
   "devDependencies": {

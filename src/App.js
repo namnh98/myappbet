@@ -17,6 +17,11 @@ import ModalSignup from './components/ModalSignup';
 const App = () => {
   const [visible, setVisible] = useState(false);
   const [isVisible, setIsVible] = useState(false);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [captchaCode, setCaptchaCode] = useState('');
+  const [textAlert,setTextAlert] = useState('');
 
   const handleSignin = () => {
     setVisible(true);
@@ -34,6 +39,18 @@ const App = () => {
   const SignIn = () => {
     setVisible(false);
   };
+  const handleUsername = text => {
+    setUsername(text);
+  };
+  const handlePassword = text => {
+    setPassword(text);
+  };
+  const handlePhoneNumber = text => {
+    setPhoneNumber(text);
+  };
+  const handleCaptchaCode = text => {
+    setCaptchaCode(text);
+  };
   return (
     <View style={styles.container}>
       <Image source={images.logo} style={styles.logoStyle} />
@@ -41,7 +58,21 @@ const App = () => {
         <TouchableOpacity style={styles.buttonStyle} onPress={handleSignup}>
           <Text style={styles.titleButton}>Đăng ký</Text>
         </TouchableOpacity>
-        {isVisible && <ModalSignup visible={isVisible} handleSignUp={SignUp} />}
+        {isVisible && (
+          <ModalSignup
+            visible={isVisible}
+            handleSignUp={SignUp}
+            username={username}
+            handleUsername={handleUsername}
+            password={password}
+            handlePassword={handlePassword}
+            phoneNumber={phoneNumber}
+            handlePhoneNumber={handlePhoneNumber}
+            captchaCode={captchaCode}
+            handleCaptchaCode={handleCaptchaCode}
+            textAlert={textAlert}
+          />
+        )}
         <TouchableOpacity
           style={[styles.buttonStyle, {backgroundColor: colors.orange}]}
           onPress={handleSignin}>

@@ -37,6 +37,8 @@ const ModalSignup = props => {
                   <TextInput
                     style={styles.textInputStyle}
                     placeholder="Tên đăng nhập"
+                    value={props.username}
+                    onChangeText={props.handleUsername}
                   />
                 </View>
                 <View style={styles.itemBody}>
@@ -44,6 +46,8 @@ const ModalSignup = props => {
                   <TextInput
                     style={styles.textInputStyle}
                     placeholder="Mật khẩu"
+                    value={props.password}
+                    onChangeText={props.handlePassword}
                   />
                 </View>
                 <View style={styles.itemBody}>
@@ -51,6 +55,8 @@ const ModalSignup = props => {
                   <TextInput
                     style={styles.textInputStyle}
                     placeholder="Số điện thoại"
+                    value={props.phoneNumber}
+                    onChangeText={props.handlePhoneNumber}
                   />
                 </View>
                 <View style={styles.itemBody}>
@@ -58,6 +64,8 @@ const ModalSignup = props => {
                   <TextInput
                     style={[styles.textInputStyle, {width: '65%'}]}
                     placeholder="Mã kiểm tra"
+                    value={props.captchaCode}
+                    onChangeText={props.handleCaptchaCode}
                   />
                   <Text style={styles.textCaptcha}>123</Text>
                   <TouchableOpacity onPress={handleCaptcha}>
@@ -67,9 +75,23 @@ const ModalSignup = props => {
                     />
                   </TouchableOpacity>
                 </View>
+                {props.textAlert ? (
+                  <View
+                    style={{justifyContent: 'center', alignItems: 'center'}}>
+                    <Text style={{fontSize: Size.h30, color: 'red'}}>
+                      {props.textAlert}
+                    </Text>
+                  </View>
+                ) : null}
               </View>
-              <View style={styles.endContainer}>
-                <TouchableOpacity style={styles.buttonSignInStyle} onPress={props.handleSignUp}>
+              <View
+                style={[
+                  styles.endContainer,
+                  {height: props.textAlert ? height * 0.07 : height * 0.045},
+                ]}>
+                <TouchableOpacity
+                  style={styles.buttonSignInStyle}
+                  onPress={props.handleSignUp}>
                   <Text style={styles.titleButton}>Đăng ký</Text>
                 </TouchableOpacity>
               </View>
@@ -94,7 +116,7 @@ const styles = StyleSheet.create({
     height: height * 0.5,
     borderRadius: 20,
     alignItems: 'center',
-    paddingVertical:Size.h16
+    paddingVertical: Size.h16,
   },
   headerContainer: {
     height: Size.s100,
@@ -135,7 +157,6 @@ const styles = StyleSheet.create({
     width: Size.s100,
   },
   endContainer: {
-    height: height *0.035,
     justifyContent: 'center',
     alignItems: 'center',
   },
