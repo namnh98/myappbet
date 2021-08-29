@@ -50,13 +50,13 @@ const ModalSignup = props => {
   const onDismiss = () => {
     Keyboard.dismiss();
     setIsMoveKeyboard(false);
+    props.handleDismiss
   };
 
   const onFocus = () => {
     setIsMoveKeyboard(true);
   };
 
-  const visible = props.visible;
 
   const checkBeforeSignUp = () => {
     if (!username) {
@@ -96,11 +96,13 @@ const ModalSignup = props => {
         captchauuid,
       );
       if (resp.token) {
+        console.log('kết quả đăng ký',resp)
         Alert.alert('Thông báo', 'Bạn đã đăng ký thành công!');
         setIsRegis(true);
       }
     } catch (e) {
       console.log('lỗi đăng ký', e);
+      throw e;
     }
   };
 
@@ -115,7 +117,7 @@ const ModalSignup = props => {
     <Modal
       animationType="slide"
       transparent={true}
-      visible={isRegis === true ? !visible : visible}>
+      visible={isRegis === true ? !props.visible : props.visible}>
       <TouchableWithoutFeedback onPress={onDismiss}>
         <KeyboardAvoidingView
           style={styles.modalContainer}

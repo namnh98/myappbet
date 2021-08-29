@@ -29,10 +29,10 @@ const App = () => {
   const handleSupport = () => {
     Alert.alert('Thông báo', 'Chức năng đang phát triển');
   };
-  const SignUp = () => {
+  const handleDismissSignUp = () => {
     setIsVible(false);
   };
-  const SignIn = () => {
+  const handleDismiss = () => {
     setVisible(false);
   };
  
@@ -43,13 +43,13 @@ const App = () => {
         <TouchableOpacity style={styles.buttonStyle} onPress={handleSignup}>
           <Text style={styles.titleButton}>Đăng ký</Text>
         </TouchableOpacity>
-        {isVisible && <ModalSignup visible={isVisible} handleSignUp={SignUp} />}
+        {isVisible && <ModalSignup visible={isVisible} handleDismiss={handleDismissSignUp}/>}
         <TouchableOpacity
           style={[styles.buttonStyle, {backgroundColor: colors.orange}]}
           onPress={handleSignin}>
           <Text style={styles.titleButton}>Đăng nhập</Text>
         </TouchableOpacity>
-        {visible && <ModalSignin visible={visible} handleSignIn={SignIn} />}
+        {visible && <ModalSignin visible={visible} handleDismiss={handleDismiss}/>}
         <TouchableOpacity style={styles.buttonStyle} onPress={handleSupport}>
           <Text style={styles.titleButton}>Hỗ trợ</Text>
         </TouchableOpacity>

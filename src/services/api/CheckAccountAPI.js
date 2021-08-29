@@ -1,11 +1,10 @@
 const base_url = 'https://api.7789bet.com/789bet-ecp/api'
 
-const CheckAccountAPI = (playerid,password,Captcha,Captchauuid) => {
+const CheckAccountAPI = (playerid,timestamp) => {
   var formdata = new FormData();
   formdata.append('playerid', `${playerid}`);
-  formdata.append('password', `${password}`);
-  formdata.append('captcha', `${Captcha}`);
-  formdata.append('captchauuid', `${Captchauuid}`);
+  formdata.append('appid', '2001');
+  formdata.append('timestamp', `${timestamp}`);
 
   var requestOptions = {
     method: 'POST',

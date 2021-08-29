@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
   bodyModalContainer: {
     backgroundColor: colors.white,
     width: width * 0.9,
-    height: height * 0.44,
+    height: height * 0.5,
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
@@ -64,6 +64,14 @@ const styles = StyleSheet.create({
   },
   buttonSignInStyle: {
     backgroundColor: colors.orange,
+    height: Size.s100,
+    width: Size.s260 * 2.5,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonSignInStyleNoFill: {
+    backgroundColor: colors.gray,
     height: Size.s100,
     width: Size.s260 * 2.5,
     borderRadius: 20,
