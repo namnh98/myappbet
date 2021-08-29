@@ -36,11 +36,13 @@ const ModalSignup = props => {
   const [textAlert, setTextAlert] = useState('');
   const [isMoveKeyboard, setIsMoveKeyboard] = useState(false);
   const [isRegis, setIsRegis] = useState(false);
+  const [token,setToken] = useState('')
 
   const getCaptcha = async () => {
     const result = await CaptchaAPI();
     if (result) {
       setCaptcha(result);
+      // console.log('capt',result)
     }
   };
   useEffect(() => {
@@ -50,21 +52,24 @@ const ModalSignup = props => {
   const onDismiss = () => {
     Keyboard.dismiss();
     setIsMoveKeyboard(false);
-    props.handleDismiss
+    props.handleDismiss;
   };
 
   const onFocus = () => {
     setIsMoveKeyboard(true);
   };
 
-
   const checkBeforeSignUp = () => {
     if (!username) {
-      setTextAlert('Tên đăng nhập còn trống!');
+      setTextAlert('Tên đăng nhập còn trống và cần có chữ - số');
     } else if (!password) {
       setTextAlert('Mật khẩu còn trống!');
+    } else if (password.length < 6) {
+      setTextAlert('Mật khẩu phải đủ 6 ký tự');
     } else if (!phonenumber) {
       setTextAlert('Số điện thoại còn trống!');
+    } else if (phonenumber.length < 10) {
+      setTextAlert('Số điện thoại phải đủ 10 số');
     } else if (!confirmCaptcha) {
       setTextAlert('Mã kiểm tra còn trống!');
     } else {
@@ -95,10 +100,17 @@ const ModalSignup = props => {
         confirmCaptcha,
         captchauuid,
       );
-      if (resp.token) {
-        console.log('kết quả đăng ký',resp)
-        Alert.alert('Thông báo', 'Bạn đã đăng ký thành công!');
+      if (resp) {
+        Alert.alert('Thông báo', 'Bạn đã đăng ký thành công!', [
+          {
+            text: 'Ok',
+            onPress: props.SignUpSucess,
+            style: 'cancel',
+          },
+        ]);
         setIsRegis(true);
+        setToken(resp.token)
+        console.log('kết quả đăng ký', resp);
       }
     } catch (e) {
       console.log('lỗi đăng ký', e);
@@ -115,105 +127,114 @@ const ModalSignup = props => {
 
   return (
     <Modal
-      animationType="slide"
+      animationType="fade"
       transparent={true}
-      visible={isRegis === true ? !props.visible : props.visible}>
+      visible={isRegis ? !props.visible : props.visible}>
       <TouchableWithoutFeedback onPress={onDismiss}>
-        <KeyboardAvoidingView
-          style={styles.modalContainer}
-          behavior="padding"
-          keyboardVerticalOffset={isMoveKeyboard ? -120 : 100}>
-          <View style={styles.bodyModalContainer}>
-            <ScrollView>
-              <View style={styles.headerContainer}>
-                <Text style={styles.titleHeader}>Đăng ký</Text>
-              </View>
-              <View style={styles.bodyContainer}>
-                <View style={styles.itemBody}>
-                  <Image source={images.icon_person} style={styles.iconStyle} />
-                  <TextInput
-                    style={styles.textInputStyle}
-                    placeholder="Tên đăng nhập"
-                    value={username}
-                    onChangeText={text => setUsername(text)}
-                    onFocus={onFocus}
-                  />
+        <TouchableWithoutFeedback onPress={props.handleDismiss}>
+          <KeyboardAvoidingView
+            style={styles.modalContainer}
+            behavior="padding"
+            keyboardVerticalOffset={isMoveKeyboard ? -120 : 100}>
+            <View style={styles.bodyModalContainer}>
+              <ScrollView>
+                <View style={styles.headerContainer}>
+                  <Text style={styles.titleHeader}>Đăng ký</Text>
                 </View>
-                <View style={styles.itemBody}>
-                  <Image source={images.icon_lock} style={styles.iconStyle} />
-                  <TextInput
-                    style={styles.textInputStyle}
-                    placeholder="Mật khẩu"
-                    value={password}
-                    onChangeText={text => setPassword(text)}
-                    onFocus={onFocus}
-                    maxLength={10}
-                  />
-                </View>
-                <View style={styles.itemBody}>
-                  <Image source={images.icon_phone} style={styles.iconStyle} />
-                  <TextInput
-                    style={styles.textInputStyle}
-                    placeholder="Số điện thoại"
-                    value={phonenumber}
-                    onChangeText={text => setPhonenumber(text)}
-                    onFocus={onFocus}
-                  />
-                </View>
-                <View style={styles.itemBody}>
-                  <Image source={images.icon_key} style={styles.iconStyle} />
-                  <TextInput
-                    style={[styles.textInputStyle, {width: '60%'}]}
-                    placeholder="Mã kiểm tra"
-                    value={confirmCaptcha}
-                    onChangeText={text => setConfirmCaptcha(text)}
-                    onFocus={onFocus}
-                  />
-                  {captcha ? (
+                <View style={styles.bodyContainer}>
+                  <View style={styles.itemBody}>
                     <Image
-                      source={{uri: captcha.image}}
-                      style={{width: Size.s100 + Size.s20, height: Size.s100}}
-                      resizeMode="contain"
+                      source={images.icon_person}
+                      style={styles.iconStyle}
                     />
-                  ) : (
-                    <ActivityIndicator color={colors.blue} />
-                  )}
-                  <TouchableOpacity onPress={getCaptcha}>
+                    <TextInput
+                      style={styles.textInputStyle}
+                      placeholder="Tên đăng nhập"
+                      value={username}
+                      onChangeText={text => setUsername(text)}
+                      onFocus={onFocus}
+                    />
+                  </View>
+                  <View style={styles.itemBody}>
+                    <Image source={images.icon_lock} style={styles.iconStyle} />
+                    <TextInput
+                      style={styles.textInputStyle}
+                      placeholder="Mật khẩu"
+                      value={password}
+                      onChangeText={text => setPassword(text)}
+                      onFocus={onFocus}
+                      maxLength={6}
+                    />
+                  </View>
+                  <View style={styles.itemBody}>
                     <Image
-                      source={images.icon_refresh}
-                      style={[styles.iconStyle, {tintColor: colors.black}]}
+                      source={images.icon_phone}
+                      style={styles.iconStyle}
                     />
+                    <TextInput
+                      style={styles.textInputStyle}
+                      placeholder="Số điện thoại"
+                      value={phonenumber}
+                      onChangeText={text => setPhonenumber(text)}
+                      onFocus={onFocus}
+                      maxLength={10}
+                    />
+                  </View>
+                  <View style={styles.itemBody}>
+                    <Image source={images.icon_key} style={styles.iconStyle} />
+                    <TextInput
+                      style={[styles.textInputStyle, {width: '60%'}]}
+                      placeholder="Mã kiểm tra"
+                      value={confirmCaptcha}
+                      onChangeText={text => setConfirmCaptcha(text)}
+                      onFocus={onFocus}
+                    />
+                    {captcha ? (
+                      <Image
+                        source={{uri: captcha.image}}
+                        style={{width: Size.s100 + Size.s20, height: Size.s100}}
+                        resizeMode="contain"
+                      />
+                    ) : (
+                      <ActivityIndicator color={colors.blue} />
+                    )}
+                    <TouchableOpacity onPress={getCaptcha}>
+                      <Image
+                        source={images.icon_refresh}
+                        style={[styles.iconStyle, {tintColor: colors.black}]}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                {textAlert ? (
+                  <View
+                    style={{
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginVertical: Size.s10,
+                    }}>
+                    <Text style={{fontSize: Size.h30, color: 'red'}}>
+                      {textAlert}
+                    </Text>
+                  </View>
+                ) : (
+                  <View style={{height: 10}} />
+                )}
+                <View style={styles.endContainer}>
+                  <TouchableOpacity
+                    style={
+                      !check()
+                        ? styles.buttonSignInStyleNoFill
+                        : styles.buttonSignInStyle
+                    }
+                    onPress={checkBeforeSignUp}>
+                    <Text style={styles.titleButton}>Đăng ký</Text>
                   </TouchableOpacity>
                 </View>
-              </View>
-              {textAlert ? (
-                <View
-                  style={{
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    marginVertical: Size.s10,
-                  }}>
-                  <Text style={{fontSize: Size.h30, color: 'red'}}>
-                    {textAlert}
-                  </Text>
-                </View>
-              ) : (
-                <View style={{height: 10}} />
-              )}
-              <View style={styles.endContainer}>
-                <TouchableOpacity
-                  style={
-                    !check()
-                      ? styles.buttonSignInStyleNoFill
-                      : styles.buttonSignInStyle
-                  }
-                  onPress={checkBeforeSignUp}>
-                  <Text style={styles.titleButton}>Đăng ký</Text>
-                </TouchableOpacity>
-              </View>
-            </ScrollView>
-          </View>
-        </KeyboardAvoidingView>
+              </ScrollView>
+            </View>
+          </KeyboardAvoidingView>
+        </TouchableWithoutFeedback>
       </TouchableWithoutFeedback>
     </Modal>
   );

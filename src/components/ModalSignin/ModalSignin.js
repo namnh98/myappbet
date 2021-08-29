@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   KeyboardAvoidingView,
+  Alert,
 } from 'react-native';
 import {colors} from '../../styles/Color';
 import {images} from '../../assets/index';
@@ -26,11 +27,14 @@ const ModalSignin = props => {
   const [password, setPassword] = useState('');
   const [confirmCaptcha, setConfirmCaptcha] = useState('');
   const [textAlert, setTextAlert] = useState('');
+  const [isLogin, setIsLogin] = useState(false);
+  const [token,setToken] = useState('')
 
   const getCaptcha = async () => {
     const result = await CaptchaAPI();
     if (result) {
       setCaptcha(result);
+      // console.log('captcha',captcha)
     }
   };
   useEffect(() => {
@@ -99,10 +103,17 @@ const ModalSignin = props => {
         confirmCaptcha,
         captchauuid,
       );
-      if (resp.token) {
-        console.log('r',resp)
-        Alert.alert('Thông báo', 'Bạn đã đăng ký thành công!');
-        setIsRegis(true);
+      if (resp) {
+        Alert.alert('Thông báo', 'Bạn đã đăng nhập thành công!', [
+          {
+            text: "Ok",
+            onPress: props.LoginSucess,
+            style: "cancel"
+          },
+        ]);
+        setIsLogin(true);
+        setToken(resp.token)
+        console.log('r login', resp);
       }
     } catch (e) {
       console.log('lỗi đăng nhập', e);
@@ -111,9 +122,12 @@ const ModalSignin = props => {
   };
 
   return (
-    <Modal animationType="fade" transparent={true} visible={props.visible}>
-      <TouchableWithoutFeedback onPress={props.handleDismiss}>
-        <TouchableWithoutFeedback onPress={onDismiss}>
+    <Modal
+      animationType="fade"
+      transparent={true}
+      visible={isLogin ? !props.visible : props.visible}>
+      <TouchableWithoutFeedback onPress={onDismiss}>
+        <TouchableWithoutFeedback onPress={props.handleDismiss}>
           <KeyboardAvoidingView
             style={styles.modalContainer}
             behavior="padding"

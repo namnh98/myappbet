@@ -1,12 +1,6 @@
 const base_URL = 'https://api.7789bet.com/789bet-ecp/api/v1';
 
-const SignUpAPI = (
-  Playerid,
-  Password,
-  Mobile,
-  Captcha,
-  Captchauuid,
-) => {
+const SignUpAPI = (Playerid, Password, Mobile, Captcha, Captchauuid) => {
   var formdata = new FormData();
   formdata.append('ulagentaccount', '');
   formdata.append('playerid', `${Playerid}`);
@@ -27,7 +21,7 @@ const SignUpAPI = (
   return fetch(`${base_URL}` + '/register', requestOptions)
     .then(response => response.json())
     .catch(error => {
-      console.log('error SignUp', error)
+      console.log('error SignUp', error);
       throw error;
     });
 };
