@@ -1,18 +1,19 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import {
   Text,
   View,
   Modal,
   TouchableWithoutFeedback,
   Keyboard,
-  KeyboardAvoidingView,
   Dimensions,
   Image,
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
-  Platform,
+  Alert,
+  KeyboardAvoidingView,
   SafeAreaView,
+  ScrollView,
 } from 'react-native';
 import {colors} from '../../styles/Color';
 import Size from '@dungdang/react-native-basic/src/Sizes';
@@ -20,8 +21,11 @@ import {images} from '../../assets/index';
 import {styles} from './style';
 
 import CaptchaAPI from '../../services/api/CaptchaAPI';
+import SignUpAPI from '../../services/api/SignUpAPI';
 
-const {height} = Dimensions.get('screen');
+// import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+
+const {height, width} = Dimensions.get('screen');
 
 const ModalSignup = props => {
   const [captcha, setCaptcha] = useState();
@@ -31,11 +35,12 @@ const ModalSignup = props => {
   const [confirmCaptcha, setConfirmCaptcha] = useState('');
   const [textAlert, setTextAlert] = useState('');
   const [isMoveKeyboard, setIsMoveKeyboard] = useState(false);
+  const [isRegis, setIsRegis] = useState(false);
 
   const getCaptcha = async () => {
     const result = await CaptchaAPI();
     if (result) {
-      setCaptcha(result.image);
+      setCaptcha(result);
     }
   };
   useEffect(() => {
@@ -53,14 +58,71 @@ const ModalSignup = props => {
 
   const visible = props.visible;
 
+  const checkBeforeSignUp = () => {
+    if (!username) {
+      setTextAlert('Tên đăng nhập còn trống!');
+    } else if (!password) {
+      setTextAlert('Mật khẩu còn trống!');
+    } else if (!phonenumber) {
+      setTextAlert('Số điện thoại còn trống!');
+    } else if (!confirmCaptcha) {
+      setTextAlert('Mã kiểm tra còn trống!');
+    } else {
+      handleSignUp(
+        username,
+        password,
+        phonenumber,
+        confirmCaptcha,
+        captcha.uuid,
+      );
+      setTextAlert('');
+    }
+  };
+
+  const handleSignUp = async (
+    username,
+    password,
+    phonenumber,
+    confirmCaptcha,
+    captchauuid,
+  ) => {
+    const newphone = phonenumber.replace('0', '84 ');
+    try {
+      const resp = await SignUpAPI(
+        username,
+        password,
+        newphone,
+        confirmCaptcha,
+        captchauuid,
+      );
+      if (resp.token) {
+        Alert.alert('Thông báo', 'Bạn đã đăng ký thành công!');
+        setIsRegis(true);
+      }
+    } catch (e) {
+      console.log('lỗi đăng ký', e);
+    }
+  };
+
+  const check = () => {
+    if (!username || !password || !phonenumber || !confirmCaptcha) {
+      return false;
+    }
+    return true;
+  };
+
   return (
-    <Modal animationType="slide" transparent={true} visible={visible}>
-      <KeyboardAvoidingView
-        enabled
-        behavior={isMoveKeyboard ? 'position' : 'padding'}>
-        <TouchableWithoutFeedback onPress={onDismiss}>
-          <View style={styles.modalContainer}>
-            <View style={styles.bodyModalContainer}>
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={isRegis === true ? !visible : visible}>
+      <TouchableWithoutFeedback onPress={onDismiss}>
+        <KeyboardAvoidingView
+          style={styles.modalContainer}
+          behavior="padding"
+          keyboardVerticalOffset={isMoveKeyboard ? -120 : 100}>
+          <View style={styles.bodyModalContainer}>
+            <ScrollView>
               <View style={styles.headerContainer}>
                 <Text style={styles.titleHeader}>Đăng ký</Text>
               </View>
@@ -83,6 +145,7 @@ const ModalSignup = props => {
                     value={password}
                     onChangeText={text => setPassword(text)}
                     onFocus={onFocus}
+                    maxLength={10}
                   />
                 </View>
                 <View style={styles.itemBody}>
@@ -106,7 +169,7 @@ const ModalSignup = props => {
                   />
                   {captcha ? (
                     <Image
-                      source={{uri: captcha}}
+                      source={{uri: captcha.image}}
                       style={{width: Size.s100 + Size.s20, height: Size.s100}}
                       resizeMode="contain"
                     />
@@ -120,30 +183,36 @@ const ModalSignup = props => {
                     />
                   </TouchableOpacity>
                 </View>
-                {textAlert ? (
-                  <View
-                    style={{justifyContent: 'center', alignItems: 'center'}}>
-                    <Text style={{fontSize: Size.h30, color: 'red'}}>
-                      {textAlert}
-                    </Text>
-                  </View>
-                ) : null}
               </View>
-              <View
-                style={[
-                  styles.endContainer,
-                  {height: props.textAlert ? height * 0.07 : height * 0.045},
-                ]}>
+              {textAlert ? (
+                <View
+                  style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginVertical: Size.s10,
+                  }}>
+                  <Text style={{fontSize: Size.h30, color: 'red'}}>
+                    {textAlert}
+                  </Text>
+                </View>
+              ) : (
+                <View style={{height: 10}} />
+              )}
+              <View style={styles.endContainer}>
                 <TouchableOpacity
-                  style={styles.buttonSignInStyle}
-                  onPress={props.handleSignUp}>
+                  style={
+                    !check()
+                      ? styles.buttonSignInStyleNoFill
+                      : styles.buttonSignInStyle
+                  }
+                  onPress={checkBeforeSignUp}>
                   <Text style={styles.titleButton}>Đăng ký</Text>
                 </TouchableOpacity>
               </View>
-            </View>
+            </ScrollView>
           </View>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
+        </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
     </Modal>
   );
 };

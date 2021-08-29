@@ -10,7 +10,7 @@ const CaptchaAPI = () => {
         .then(response => response.json())
         .catch(error => {
             console.log('error Captcha', error);
-            throw e;
+            throw error;
         });
 };
 
