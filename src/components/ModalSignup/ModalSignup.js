@@ -22,6 +22,9 @@ import {styles} from './style';
 
 import CaptchaAPI from '../../services/api/CaptchaAPI';
 import SignUpAPI from '../../services/api/SignUpAPI';
+import {useRecoilState} from 'recoil';
+import {AuthenFormState} from '../../services/recoil/Authen';
+import {useNavigation} from '@react-navigation/core';
 
 // import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
@@ -36,13 +39,13 @@ const ModalSignup = props => {
   const [textAlert, setTextAlert] = useState('');
   const [isMoveKeyboard, setIsMoveKeyboard] = useState(false);
   const [isRegis, setIsRegis] = useState(false);
-  const [token,setToken] = useState('')
+  const [authen, setAuthen] = useRecoilState(AuthenFormState);
+  const navigation = useNavigation();
 
   const getCaptcha = async () => {
     const result = await CaptchaAPI();
     if (result) {
       setCaptcha(result);
-      // console.log('capt',result)
     }
   };
   useEffect(() => {
@@ -52,7 +55,6 @@ const ModalSignup = props => {
   const onDismiss = () => {
     Keyboard.dismiss();
     setIsMoveKeyboard(false);
-    props.handleDismiss;
   };
 
   const onFocus = () => {
@@ -101,16 +103,16 @@ const ModalSignup = props => {
         captchauuid,
       );
       if (resp) {
+        // console.log('resp',resp.token)
+        setAuthen({...authen, tokenSignUp: resp.token});
         Alert.alert('Thông báo', 'Bạn đã đăng ký thành công!', [
           {
             text: 'Ok',
-            onPress: props.SignUpSucess,
+            onPress: navigation.navigate('HOME'),
             style: 'cancel',
           },
         ]);
         setIsRegis(true);
-        setToken(resp.token)
-        console.log('kết quả đăng ký', resp);
       }
     } catch (e) {
       console.log('lỗi đăng ký', e);

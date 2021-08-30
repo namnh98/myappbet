@@ -17,8 +17,11 @@ import {images} from '../../assets/index';
 import CaptchaAPI from '../../services/api/CaptchaAPI';
 import styles from './style';
 import Size from '@dungdang/react-native-basic/src/Sizes';
-import CheckAccountAPI from '../../services/api/CheckAccountAPI';
+// import CheckAccountAPI from '../../services/api/CheckAccountAPI';
 import SignInAPI from '../../services/api/SignInAPI';
+import {useNavigation} from '@react-navigation/core';
+import {useRecoilState} from 'recoil';
+import {AuthenFormState} from '../../services/recoil/Authen';
 
 const ModalSignin = props => {
   const [captcha, setCaptcha] = useState();
@@ -28,13 +31,13 @@ const ModalSignin = props => {
   const [confirmCaptcha, setConfirmCaptcha] = useState('');
   const [textAlert, setTextAlert] = useState('');
   const [isLogin, setIsLogin] = useState(false);
-  const [token,setToken] = useState('')
+  const navigation = useNavigation();
+  const [authen, setAuthen] = useRecoilState(AuthenFormState);
 
   const getCaptcha = async () => {
     const result = await CaptchaAPI();
     if (result) {
       setCaptcha(result);
-      // console.log('captcha',captcha)
     }
   };
   useEffect(() => {
@@ -44,7 +47,6 @@ const ModalSignin = props => {
   const onDismiss = () => {
     Keyboard.dismiss();
     setIsMoveKeyboard(false);
-    props.handleDismiss;
   };
 
   const onFocus = () => {
@@ -104,16 +106,15 @@ const ModalSignin = props => {
         captchauuid,
       );
       if (resp) {
+        setAuthen({...authen, tokenSignIn:resp.token});
         Alert.alert('Thông báo', 'Bạn đã đăng nhập thành công!', [
           {
-            text: "Ok",
-            onPress: props.LoginSucess,
-            style: "cancel"
+            text: 'Ok',
+            onPress: navigation.navigate('HOME'),
+            style: 'cancel',
           },
         ]);
         setIsLogin(true);
-        setToken(resp.token)
-        console.log('r login', resp);
       }
     } catch (e) {
       console.log('lỗi đăng nhập', e);
