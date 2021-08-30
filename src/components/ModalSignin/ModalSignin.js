@@ -22,6 +22,7 @@ import SignInAPI from '../../services/api/SignInAPI';
 import {useNavigation} from '@react-navigation/core';
 import {useRecoilState} from 'recoil';
 import {AuthenFormState} from '../../services/recoil/Authen';
+import Sizes from '@dungdang/react-native-basic/src/Sizes';
 
 const ModalSignin = props => {
   const [captcha, setCaptcha] = useState();
@@ -33,6 +34,8 @@ const ModalSignin = props => {
   const [isLogin, setIsLogin] = useState(false);
   const navigation = useNavigation();
   const [authen, setAuthen] = useRecoilState(AuthenFormState);
+  const [isShowPass, setIsShowPass] = useState(false);
+
 
   const getCaptcha = async () => {
     const result = await CaptchaAPI();
@@ -105,7 +108,7 @@ const ModalSignin = props => {
         confirmCaptcha,
         captchauuid,
       );
-      if (resp) {
+      if (!resp.code) {
         setAuthen({...authen, tokenSignIn:resp.token});
         Alert.alert('Thông báo', 'Bạn đã đăng nhập thành công!', [
           {
@@ -118,8 +121,18 @@ const ModalSignin = props => {
       }
     } catch (e) {
       console.log('lỗi đăng nhập', e);
+      Alert.alert('Thông báo', 'Bạn đã đăng nhập thất bại!', [
+        {
+          text: 'Ok',
+          style: 'cancel',
+        },
+      ]);
       throw e;
     }
+  };
+
+  const showPass = () => {
+    setIsShowPass(!isShowPass);
   };
 
   return (
@@ -150,15 +163,37 @@ const ModalSignin = props => {
                   />
                 </View>
                 <View style={styles.itemBody}>
-                  <Image source={images.icon_lock} style={styles.iconStyle} />
-                  <TextInput
-                    style={styles.textInputStyle}
-                    placeholder="Mật khẩu"
-                    value={password}
-                    onChangeText={text => setPassword(text)}
-                    onFocus={onFocus}
-                  />
-                </View>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        height: Sizes.s100,
+                        alignItems: 'center',
+                      }}>
+                      <Image
+                        source={images.icon_lock}
+                        style={styles.iconStyle}
+                      />
+                      <View style={{width: Sizes.s10}} />
+                      <TextInput
+                        style={[styles.textInputStyle, {width: '80%'}]}
+                        placeholder="Mật khẩu"
+                        value={password}
+                        onChangeText={text => setPassword(text)}
+                        onFocus={onFocus}
+                        maxLength={6}
+                        secureTextEntry={!isShowPass ? true : false}
+                      />
+                    </View>
+                    <TouchableOpacity onPress={showPass}>
+                      <Image
+                        source={
+                          !isShowPass ? images.icon_no_eye : images.icon_eye
+                        }
+                        style={styles.iconStyle}
+                      />
+                    </TouchableOpacity>
+                    <View style={{width: Sizes.h16 / 2}} />
+                  </View>
                 <View style={styles.itemBody}>
                   <Image source={images.icon_key} style={styles.iconStyle} />
                   <TextInput

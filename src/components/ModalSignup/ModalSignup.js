@@ -25,6 +25,7 @@ import SignUpAPI from '../../services/api/SignUpAPI';
 import {useRecoilState} from 'recoil';
 import {AuthenFormState} from '../../services/recoil/Authen';
 import {useNavigation} from '@react-navigation/core';
+import Sizes from '@dungdang/react-native-basic/src/Sizes';
 
 // import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
@@ -41,6 +42,7 @@ const ModalSignup = props => {
   const [isRegis, setIsRegis] = useState(false);
   const [authen, setAuthen] = useRecoilState(AuthenFormState);
   const navigation = useNavigation();
+  const [isShowPass, setIsShowPass] = useState(false);
 
   const getCaptcha = async () => {
     const result = await CaptchaAPI();
@@ -102,8 +104,8 @@ const ModalSignup = props => {
         confirmCaptcha,
         captchauuid,
       );
-      if (resp) {
-        // console.log('resp',resp.token)
+      if (!resp.code) {
+        console.log('resp',resp)
         setAuthen({...authen, tokenSignUp: resp.token});
         Alert.alert('Thông báo', 'Bạn đã đăng ký thành công!', [
           {
@@ -113,9 +115,23 @@ const ModalSignup = props => {
           },
         ]);
         setIsRegis(true);
+      }else if(resp.msg==='Invalid param: playerid is invalid'){
+        Alert.alert('Thông báo', 'Tên đăng nhập không hợp lệ. Phải có chữ trước và số sau.', [
+          {
+            text: 'Ok',
+            onPress: navigation.replace('LOGIN'),
+            style: 'cancel',
+          },
+        ]);
       }
     } catch (e) {
       console.log('lỗi đăng ký', e);
+      Alert.alert('Thông báo', 'Bạn đã đăng ký thất bại!', [
+        {
+          text: 'Ok',
+          style: 'cancel',
+        },
+      ]);
       throw e;
     }
   };
@@ -125,6 +141,10 @@ const ModalSignup = props => {
       return false;
     }
     return true;
+  };
+
+  const showPass = () => {
+    setIsShowPass(!isShowPass);
   };
 
   return (
@@ -158,15 +178,36 @@ const ModalSignup = props => {
                     />
                   </View>
                   <View style={styles.itemBody}>
-                    <Image source={images.icon_lock} style={styles.iconStyle} />
-                    <TextInput
-                      style={styles.textInputStyle}
-                      placeholder="Mật khẩu"
-                      value={password}
-                      onChangeText={text => setPassword(text)}
-                      onFocus={onFocus}
-                      maxLength={6}
-                    />
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        height: Sizes.s100,
+                        alignItems: 'center',
+                      }}>
+                      <Image
+                        source={images.icon_lock}
+                        style={styles.iconStyle}
+                      />
+                      <View style={{width: Sizes.s10}} />
+                      <TextInput
+                        style={[styles.textInputStyle, {width: '80%'}]}
+                        placeholder="Mật khẩu"
+                        value={password}
+                        onChangeText={text => setPassword(text)}
+                        onFocus={onFocus}
+                        maxLength={6}
+                        secureTextEntry={!isShowPass ? true : false}
+                      />
+                    </View>
+                    <TouchableOpacity onPress={showPass}>
+                      <Image
+                        source={
+                          !isShowPass ? images.icon_no_eye : images.icon_eye
+                        }
+                        style={styles.iconStyle}
+                      />
+                    </TouchableOpacity>
+                    <View style={{width: Sizes.h16 / 2}} />
                   </View>
                   <View style={styles.itemBody}>
                     <Image
