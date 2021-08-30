@@ -36,10 +36,10 @@ const ModalSignin = props => {
   const [authen, setAuthen] = useRecoilState(AuthenFormState);
   const [isShowPass, setIsShowPass] = useState(false);
 
-
   const getCaptcha = async () => {
     const result = await CaptchaAPI();
     if (result) {
+      console.log('cáp', result);
       setCaptcha(result);
     }
   };
@@ -54,6 +54,7 @@ const ModalSignin = props => {
 
   const onFocus = () => {
     setIsMoveKeyboard(true);
+    setTextAlert('');
   };
 
   const check = () => {
@@ -108,8 +109,18 @@ const ModalSignin = props => {
         confirmCaptcha,
         captchauuid,
       );
-      if (!resp.code) {
-        setAuthen({...authen, tokenSignIn:resp.token});
+      console.log('resp', resp);
+      if (resp.msg === 'userid or password is incorrect') {
+        setTextAlert('Tên đăng nhập hoặc mật khẩu không đúng!');
+        getCaptcha();
+      } else if (resp.msg === 'Captcha is invalid') {
+        setTextAlert('Mã kiểm tra không đúng');
+        getCaptcha();
+      } else if (resp.msg === "Player's status is SUSPENDED") {
+        setTextAlert('Tài khoản này đã khoá. Vui lòng dùng tài khoản khác!');
+        getCaptcha();
+      } else if (!resp.code) {
+        setAuthen({...authen, tokenSignIn: resp.token});
         Alert.alert('Thông báo', 'Bạn đã đăng nhập thành công!', [
           {
             text: 'Ok',
@@ -121,12 +132,7 @@ const ModalSignin = props => {
       }
     } catch (e) {
       console.log('lỗi đăng nhập', e);
-      Alert.alert('Thông báo', 'Bạn đã đăng nhập thất bại!', [
-        {
-          text: 'Ok',
-          style: 'cancel',
-        },
-      ]);
+      setTextAlert('Bạn đã đăng nhập thất bại');
       throw e;
     }
   };
@@ -158,50 +164,50 @@ const ModalSignin = props => {
                     placeholder="Tên đăng nhập"
                     value={username}
                     onChangeText={text => setUsername(text)}
+                    placeholderTextColor={colors.gray}
                     onFocus={onFocus}
                     autoFocus
                   />
                 </View>
                 <View style={styles.itemBody}>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        height: Sizes.s100,
-                        alignItems: 'center',
-                      }}>
-                      <Image
-                        source={images.icon_lock}
-                        style={styles.iconStyle}
-                      />
-                      <View style={{width: Sizes.s10}} />
-                      <TextInput
-                        style={[styles.textInputStyle, {width: '80%'}]}
-                        placeholder="Mật khẩu"
-                        value={password}
-                        onChangeText={text => setPassword(text)}
-                        onFocus={onFocus}
-                        maxLength={6}
-                        secureTextEntry={!isShowPass ? true : false}
-                      />
-                    </View>
-                    <TouchableOpacity onPress={showPass}>
-                      <Image
-                        source={
-                          !isShowPass ? images.icon_no_eye : images.icon_eye
-                        }
-                        style={styles.iconStyle}
-                      />
-                    </TouchableOpacity>
-                    <View style={{width: Sizes.h16 / 2}} />
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      height: Sizes.s100,
+                      alignItems: 'center',
+                    }}>
+                    <Image source={images.icon_lock} style={styles.iconStyle} />
+                    <View style={{width: Sizes.s10}} />
+                    <TextInput
+                      style={[styles.textInputStyle, {width: '80%'}]}
+                      placeholder="Mật khẩu"
+                      value={password}
+                      onChangeText={text => setPassword(text)}
+                      placeholderTextColor={colors.gray}
+                      onFocus={onFocus}
+                      secureTextEntry={!isShowPass ? true : false}
+                    />
                   </View>
+                  <TouchableOpacity onPress={showPass}>
+                    <Image
+                      source={
+                        !isShowPass ? images.icon_no_eye : images.icon_eye
+                      }
+                      style={styles.iconStyle}
+                    />
+                  </TouchableOpacity>
+                  <View style={{width: Sizes.h16 / 2}} />
+                </View>
                 <View style={styles.itemBody}>
                   <Image source={images.icon_key} style={styles.iconStyle} />
                   <TextInput
                     style={[styles.textInputStyle, {width: '60%'}]}
                     placeholder="Mã kiểm tra"
+                    placeholderTextColor={colors.gray}
                     value={confirmCaptcha}
                     onChangeText={text => setConfirmCaptcha(text)}
                     onFocus={onFocus}
+                    maxLength={4}
                   />
                   {captcha ? (
                     <Image

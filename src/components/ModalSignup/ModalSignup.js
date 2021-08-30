@@ -61,6 +61,7 @@ const ModalSignup = props => {
 
   const onFocus = () => {
     setIsMoveKeyboard(true);
+    setTextAlert('');
   };
 
   const checkBeforeSignUp = () => {
@@ -104,8 +105,15 @@ const ModalSignup = props => {
         confirmCaptcha,
         captchauuid,
       );
+      console.log('resp', resp);
+      if (resp.msg === 'The specified mobile has been registered') {
+        setTextAlert('Số điện thoại này đã đăng ký. Hãy đổi số khác.');
+        getCaptcha();
+      } else if(resp==='Invalid param: playerid is invalid'){
+        setTextAlert('Tên đăng nhập không hợp lệ.')
+        getCaptcha();
+      } else
       if (!resp.code) {
-        console.log('resp',resp)
         setAuthen({...authen, tokenSignUp: resp.token});
         Alert.alert('Thông báo', 'Bạn đã đăng ký thành công!', [
           {
@@ -115,29 +123,24 @@ const ModalSignup = props => {
           },
         ]);
         setIsRegis(true);
-      }else if(resp.msg==='Invalid param: playerid is invalid'){
-        Alert.alert('Thông báo', 'Tên đăng nhập không hợp lệ. Phải có chữ trước và số sau.', [
-          {
-            text: 'Ok',
-            onPress: navigation.replace('LOGIN'),
-            style: 'cancel',
-          },
-        ]);
+      } else if (resp.msg === 'Invalid param: playerid is invalid') {
+        setTextAlert('Tên đăng nhập không hợp lệ')
+        getCaptcha();
       }
     } catch (e) {
       console.log('lỗi đăng ký', e);
-      Alert.alert('Thông báo', 'Bạn đã đăng ký thất bại!', [
-        {
-          text: 'Ok',
-          style: 'cancel',
-        },
-      ]);
+      setTextAlert('Bạn đăng ký thất bại.')
       throw e;
     }
   };
 
   const check = () => {
-    if (!username || !password || !phonenumber || !confirmCaptcha) {
+    if (
+      !username ||
+      !password ||
+      !phonenumber ||
+      (!confirmCaptcha && confirmCaptcha.length < 4)
+    ) {
       return false;
     }
     return true;
@@ -172,6 +175,7 @@ const ModalSignup = props => {
                     <TextInput
                       style={styles.textInputStyle}
                       placeholder="Tên đăng nhập"
+                      placeholderTextColor={colors.gray}
                       value={username}
                       onChangeText={text => setUsername(text)}
                       onFocus={onFocus}
@@ -195,8 +199,8 @@ const ModalSignup = props => {
                         value={password}
                         onChangeText={text => setPassword(text)}
                         onFocus={onFocus}
-                        maxLength={6}
                         secureTextEntry={!isShowPass ? true : false}
+                        placeholderTextColor={colors.gray}
                       />
                     </View>
                     <TouchableOpacity onPress={showPass}>
@@ -218,6 +222,7 @@ const ModalSignup = props => {
                       style={styles.textInputStyle}
                       placeholder="Số điện thoại"
                       value={phonenumber}
+                      placeholderTextColor={colors.gray}
                       onChangeText={text => setPhonenumber(text)}
                       onFocus={onFocus}
                       maxLength={10}
@@ -229,6 +234,7 @@ const ModalSignup = props => {
                       style={[styles.textInputStyle, {width: '60%'}]}
                       placeholder="Mã kiểm tra"
                       value={confirmCaptcha}
+                      placeholderTextColor={colors.gray}
                       onChangeText={text => setConfirmCaptcha(text)}
                       onFocus={onFocus}
                     />

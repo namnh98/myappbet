@@ -53,6 +53,7 @@ const styles = StyleSheet.create({
     width: '90%',
     paddingVertical: Size.h16,
     paddingHorizontal: Size.h8,
+    color:colors.black
   },
   textCaptcha: {
     width: Size.s100,
