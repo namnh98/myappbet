@@ -27,7 +27,7 @@ const App = () => {
     setIsVible(true);
   };
   const handleSupport = () => {
-    Alert.alert('Thông báo', 'Chức năng đang phát triển');
+    Linking.openURL('tel://0878635763')
   };
   const handleDismissSignUp = () => {
     setIsVible(false);
